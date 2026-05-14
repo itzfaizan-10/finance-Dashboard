@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import javax.management.RuntimeMBeanException;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -54,7 +56,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         );
         System.out.println("User saved with name: " + user.getName());
         String token = jwtUtil.generateToken(user);
-        response.sendRedirect(frontendRedirectUrl + "?token=" + token);
+        String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8);
+//        String token = jwtUtil.generateToken(user);
+        response.sendRedirect(frontendRedirectUrl + "/dashboard?token=" + encodedToken);
 
     }
 }

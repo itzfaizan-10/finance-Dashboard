@@ -22,6 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -57,7 +59,7 @@ public class ConfigSecurity {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-            http.cors(cros -> {})
+            http.cors(cros -> cros.configurationSource(corsConfigurationSource()))
                     .csrf(csrf -> csrf.disable())
                     .sessionManagement(sessionConfig ->
                             sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -71,7 +73,7 @@ public class ConfigSecurity {
                     "/api/dashboard/**",
                     "/api/transaction/**",
                     "/api/budget/**"
-                ).permitAll().anyRequest().permitAll()
+                ).permitAll().anyRequest().authenticated()
                     )
                     .exceptionHandling(ex -> ex
                             .authenticationEntryPoint((request, response, authException) -> {
@@ -104,6 +106,5 @@ public class ConfigSecurity {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
     }
 
