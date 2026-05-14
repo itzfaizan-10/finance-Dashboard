@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://finance-dashboard-frontend-x7l4.vercel.app")
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
