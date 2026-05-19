@@ -56,39 +56,43 @@ public class ConfigSecurity {
                     .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
         }
 
+
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-            http.cors(cros -> cros.configurationSource(corsConfigurationSource()))
+            http
+                    .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                     .csrf(csrf -> csrf.disable())
-                    .sessionManagement(sessionConfig ->
-                            sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                    .sessionManagement(session ->
+                            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    )
 
                     .authorizeHttpRequests(auth -> auth
-                          .requestMatchers(
-                    "/api/auth/**",
-                    "/api/auth/login",
-                    "/api/login",
-                    "/oauth2/**",
-                    "/api/dashboard/**",
-                    "/api/transaction/**",
-                    "/api/budget/**"
-                ).permitAll().anyRequest().authenticated()
+                            .requestMatchers(
+                                    "/api/auth/**",
+                                    "/oauth2/**",
+                                    "/login/**"
+                            ).permitAll()
+
+                            .anyRequest().authenticated()
                     )
-                    .exceptionHandling(ex -> ex
-                            .authenticationEntryPoint((request, response, authException) -> {
-                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                                response.getWriter().write("Unauthorized: " + authException.getMessage());
-                            })
-                    )
+
                     .oauth2Login(oauth -> oauth
                             .successHandler(oAuth2SuccessHandler)
                             .failureHandler((request, response, exception) -> {
-                                log.error("OAuth2 error: {} ", exception.getMessage());
                                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                                 response.getWriter().write("OAuth2 Login Failed");
                             })
                     )
+
+                    .exceptionHandling(ex -> ex
+                            .authenticationEntryPoint((request, response, authException) -> {
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.getWriter().write("Unauthorized");
+                            })
+                    )
+
                     .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
             return http.build();
